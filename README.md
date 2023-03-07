@@ -107,6 +107,7 @@ An example of one of my web site config files is:
     ErrorLog /var/www/log/error.log
     CustomLog /var/www/log/requests.log combined
 </VirtualHost>
+```
 
 The configuration above creates the virtual host config needed to activate my web site using Apache. The file name can be anything you want
 as long as it ends in .conf which is called by the Apache configuration to include any CONF files in "sites-enabled". This
@@ -115,7 +116,6 @@ actual config files are. The idea is you can link a file (ln -s) and if you chan
 those changes will be in the linked sites in "sites-enabled". You only need to change the contents in sites-available. There
 is a longer lesson here that I am not going to get into. You probably get the gist of this setup by now.
 
-```
 Be sure and name this "something.conf" (with the .conf extension) and put it in the "sites-available" directory above. And when you are ready to enable it put a link to that in the "sites-enabled" directory:
 
 ```
