@@ -89,9 +89,13 @@ This is what I do:
 
 1. Install Apache ("yum install httpd")
 1. Create your website in /etc/httpd.
-      1. I create two directories
-      1. /etc/httpd/sites-available - where I put my web site config file.
-      1. /etc/httpd/sites-enabled - where I link my active web sites I want to expose to the Internet.
+   1. I create two directories
+   2. /etc/httpd/sites-available - where I put my web site config file.
+   3. /etc/httpd/sites-enabled - where I link my active web sites I want to expose to the Internet.
+2. Create the log directory.
+   1. /var/www/log
+   2. touch /var/www/log/error.log
+   3. touch /var/www/log/requests.log 
 
 An example of one of my web site config files is:
 
@@ -103,14 +107,34 @@ An example of one of my web site config files is:
     ErrorLog /var/www/log/error.log
     CustomLog /var/www/log/requests.log combined
 </VirtualHost>
-```
 
-This creates the virtual host config needed to activate my web site using Apache. The file name can be anything you want
+The configuration above creates the virtual host config needed to activate my web site using Apache. The file name can be anything you want
 as long as it ends in .conf which is called by the Apache configuration to include any CONF files in "sites-enabled". This
 is "standard" Apache setup. Anything in "sites-enabled" is simply a soft link to anything in "sites-available" where the
 actual config files are. The idea is you can link a file (ln -s) and if you change the contents of the file in "sites-available"
 those changes will be in the linked sites in "sites-enabled". You only need to change the contents in sites-available. There
 is a longer lesson here that I am not going to get into. You probably get the gist of this setup by now.
+
+```
+Be sure and name this "something.conf" (with the .conf extension) and put it in the "sites-available" directory above. And when you are ready to enable it put a link to that in the "sites-enabled" directory:
+
+```
+ln -s /etc/httpd/sites-available/wildwest.conf /etc/httpd/sites-enables/wildwest.conf
+```
+
+Then include this at the end of the /etc/httpd/conf/httpd.conf file:
+
+```
+IncludeOptional sites-enabled/*.conf
+```
+
+... and restart httpd:
+
+```
+systemctl restart httpd
+```
+
+There should be no complaints at this point. If there are, sort through those configuration errors. I generally put a small text file in /var/www/html/wildwest.packetwhisper.com/ and name it index.html. Inside that file you can put any text. When you go to your web site you should see that text file show up on your screen. If not, there is a configuration error somewhere. If so, you know you have set everything up properly.
 
 On my PCE I only run Apache during the certificate generation process and then turn it off when I am done.
 
