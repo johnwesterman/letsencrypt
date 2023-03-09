@@ -212,7 +212,7 @@ sudo certbot certonly --key-type rsa
 Another thing I typically do is link the long letsencrypt directory to my home directory (example):
 
 ```
-ln -s /etc/letsencrypt/live/5g.packetwhisper.com/ letsencrypt
+ln -s /etc/letsencrypt/live/wildwest.packetwhisper.com/ letsencrypt
 ```
 This way I don't have to worry about remembering where all these certs are located.
 
