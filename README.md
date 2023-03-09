@@ -161,7 +161,7 @@ To get to the meat of what I am going to describe to you based on the steps abov
 
 https://certbot.eff.org/instructions?ws=apache&os=centosrhel8
 
-## Once again the reminder to use LetsEncrypt certificates
+## Reminder on the use of LetsEncrypt certificates
 
 To use certbot, you'll need...
 1. A computer connected to the Internet
@@ -177,54 +177,74 @@ The basic flow of the certificate creation and renewal process is this:
 * Install snapd and ensure that your version of snapd is up to date
 
 ```
+dnf install snapd; systemctl start snapd
+```
+```
 sudo snap install core; sudo snap refresh core
 ```
+Link the snapd daemon correctly for snap to work properly:
+```
+sudo ln -s /var/lib/snapd/snap /snap
+```
 
-* Remove certbot-auto and any Certbot OS packages. If you have any Certbot packages installed using an OS package manager like apt, dnf, or yum, you should remove them before installing the Certbot snap to ensure that when you run the command certbot the snap is used rather than the installation from your OS package manager. The exact command to do this depends on your OS, but common examples are sudo apt-get remove certbot, sudo dnf remove certbot, or sudo yum remove certbot. If you previously used Certbot through the certbot-auto script, you should also remove its installation by following the instructions here.
+###Remove certbot-auto and any Certbot OS packages.
 
-* Install Certbot
+If you have any legacy Certbot packages installed using an OS package manager like apt, dnf, or yum, you should remove them before installing the Certbot snap image that will follow to ensure that when you run the command certbot the snap is used rather than the installation from your OS package manager. The exact command to do this depends on your OS, but common examples are sudo apt-get remove certbot, sudo dnf remove certbot, or sudo yum remove certbot. If you previously used Certbot through the certbot-auto script, you should also remove its installation by following the instructions here.
+
+###Install Certbot
 
 ```
 sudo snap install --classic certbot
 ```
 
-* Prepare the Certbot command for use
+###Prepare the Certbot command for use
 
 ```
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
-* Get and install your certificates...
+###Get and install your certificates **with a private key genenerated with type *RSA*.** Ss of this writing the PCE does not support ECC certificates.
 
 ```
-sudo certbot --apache
+sudo certbot certonly --key-type rsa
 ```
 
-* Test automatic renewal. The Certbot packages on your system come with a cron job or systemd timer that will renew your certificates automatically before they expire. You will not need to run Certbot again, unless you change your configuration. You can test automatic renewal for your certificates by running this command:
+Another thing I typically do is link the long letsencrypt directory to my home directory (example):
+
+```
+ln -s /etc/letsencrypt/live/5g.packetwhisper.com/ letsencrypt
+```
+This way I don't have to worry about remembering where all these certs are located.
+
+###Test automatic renewal.
+
+The Certbot packages on your system come with a cron job or systemd timer that will renew your certificates automatically before they expire. You will not need to run Certbot again, unless you change your configuration. You can test automatic renewal for your certificates by running this command:
 
 ```
 sudo certbot renew --dry-run
 ```
 
-* And finally we will need to automate the process using a cronjob so you don't have to think about renewing the certiricate every 90 days.
+And finally we will need to automate the process using a cronjob so you don't have to think about renewing the certiricate every 90 days.
 
 ## Give me the BEEF!
 
 OK, you made it this far. That was the hardest part. But let's just get down to the basics now.
 
-If you did all of the above successfully you likely generated a certificate in the process. LetsEncrypt puts all of the files in a directory
-/etc/letsencrypt/live/[your-site-name-here]. In that directory there will be 4 key files:
+If you did all of the above successfully you likely generated a certificate in the process. LetsEncrypt puts all of the files in a directory:
+
+/etc/letsencrypt/live/[your-site-name-here]
+
+In that directory there will be 4 key files:
 
 1. cert.pem - only the server certficate (I do not use this)
 1. chain.pem - the server and first trust (I do not use this)
 1. fullchain.pem - the full certificate chain
 1. privkey.pem - the private key
-
-And a README file.
+1. a README file
 
 The two files of concern are the fullchain.pem and privkey.pem.
 
-Inside the fullchain.pem file we are interested in the first two certificates in that file. You can either take them out by hand or use a tool I created to extract the certificates individually and rebuild the certificate file on your own by hand. If you want to play with my tool to do this you can find it here:
+Inside the fullchain.pem file we are interested in the **only the first two certificates** in that file. You can either take them out by hand or use a tool I created to extract the certificates individually and rebuild the certificate file on your own by hand. If you want to play with my tool to do this you can find it here:
 
 https://github.com/johnwesterman/certificates
 
