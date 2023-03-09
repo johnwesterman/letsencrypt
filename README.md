@@ -1,12 +1,12 @@
-# Illumio Core Letsencrypt Certificated
+# Illumio Core with LetsEncrypt Certificates
 
 ## Simplified step by step LetsEncrypt certificate usage with Illumio Core
 
 ```
 Author: John Westerman, Illumio, Inc.
-Serial number for this document is 20230307133705;
+Serial number for this document is 20230309155624;
 Version 2023.3
-Tuesday March 07, 2023 13:37
+Thursday March 09, 2023 16:03
 
 Things I changed:
 1. Minor edits
