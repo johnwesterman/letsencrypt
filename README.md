@@ -119,7 +119,7 @@ is a longer lesson here that I am not going to get into. You probably get the gi
 Be sure and name this "something.conf" (with the .conf extension) and put it in the "sites-available" directory above. And when you are ready to enable it put a link to that in the "sites-enabled" directory:
 
 ```
-ln -s /etc/httpd/sites-available/wildwest.conf /etc/httpd/sites-enables/wildwest.conf
+ln -s /etc/httpd/sites-available/wildwest.conf /etc/httpd/sites-enabled/wildwest.conf
 ```
 
 Then include this at the end of the /etc/httpd/conf/httpd.conf file:
