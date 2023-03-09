@@ -187,23 +187,23 @@ Link the snapd daemon correctly for snap to work properly:
 sudo ln -s /var/lib/snapd/snap /snap
 ```
 
-###Remove certbot-auto and any Certbot OS packages.
+### Remove certbot-auto and any Certbot OS packages.
 
 If you have any legacy Certbot packages installed using an OS package manager like apt, dnf, or yum, you should remove them before installing the Certbot snap image that will follow to ensure that when you run the command certbot the snap is used rather than the installation from your OS package manager. The exact command to do this depends on your OS, but common examples are sudo apt-get remove certbot, sudo dnf remove certbot, or sudo yum remove certbot. If you previously used Certbot through the certbot-auto script, you should also remove its installation by following the instructions here.
 
-###Install Certbot
+### Install Certbot
 
 ```
 sudo snap install --classic certbot
 ```
 
-###Prepare the Certbot command for use
+### Prepare the Certbot command for use
 
 ```
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
-###Get and install your certificates **with a private key genenerated with type *RSA*.** Ss of this writing the PCE does not support ECC certificates.
+### Get and install your certificates **with a private key genenerated with type *RSA*.** Ss of this writing the PCE does not support ECC certificates.
 
 ```
 sudo certbot certonly --key-type rsa
@@ -216,7 +216,7 @@ ln -s /etc/letsencrypt/live/5g.packetwhisper.com/ letsencrypt
 ```
 This way I don't have to worry about remembering where all these certs are located.
 
-###Test automatic renewal.
+### Test automatic renewal.
 
 The Certbot packages on your system come with a cron job or systemd timer that will renew your certificates automatically before they expire. You will not need to run Certbot again, unless you change your configuration. You can test automatic renewal for your certificates by running this command:
 
