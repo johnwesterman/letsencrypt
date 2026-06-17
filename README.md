@@ -4,12 +4,12 @@
 
 ```
 Author: John Westerman, Illumio, Inc.
-Serial number for this document is 20230310140225;
-Version 2023.3
-Friday March 10, 2023 14:02
+Serial number for this document is 20260617053143;
+Version 2026.6
+Wednesday June 17, 2026 05:32
 
 Things I changed:
-1. Cleaning up the text.
+1. Minor edits.
 ```
 
 ## Background and prerequisites
@@ -18,11 +18,11 @@ Illumio Core requires the use of TLS for secure communication between the PCE an
 
 This document will demystify at least one method of setting up and using the "free" public CA by LetsEncrypt (https://letsencrypt.org).
 
-To use LetsEncrypt certificates there is one very important requirement: Your PCE must be internet facing. This can be either on the actual internet with a public IP address (AWS) or inside your lab where you are forwarding port 80 (http) calls back to your PCE in a DMZ of some sort. This entire process will be automated. There is a callback from their servers to validate the existance of the IP address and the URL being used. If that process can not be completed you will not be issued a certificate by their CA.
+To use LetsEncrypt certificates there is one very important requirement: Your PCE must be internet facing. This can be either on the actual internet with a public IP address (AWS) or inside your lab where you are forwarding port 80 (http) calls back to your PCE in a DMZ of some sort. This entire process will be automated. There is a callback from their servers to validate the existence of the IP address and the URL being used. If that process can not be completed you will not be issued a certificate by their CA.
 
 You will need an Internet facing DNS A-record that can be resolved to your host. That URL will be used in this process and must be defined before you do anything else.
 
-If you can not provide a Internet facing PCE or create an Interfacing DNS A-record in you do not need to read further. If you can do this and want to use this certificate system then read on!
+If you can not provide an Internet-facing PCE or create an Internet-facing DNS A-record you do not need to read further. If you can do this and want to use this certificate system then read on!
 
 ## Scenario Used
 
@@ -30,7 +30,7 @@ In the following text I will show you how I use LetsEncrypt to generate a certif
 
 If you have access to Elastic IPs that makes this easier but not a requirement. If you don't have a static IP address just remember you may have to change your A-record if your IP address changes.
 
-If your PCE is like mine, it is rarely rebooted. When it is rebooted it typically gets the same IP address. Certificates don't care about a relationship with IP address so if it does change all you ahve to do is update your A-record and the rest will catch up over a short period of time once your TTL expires for your DNS record.
+If your PCE is like mine, it is rarely rebooted. When it is rebooted it typically gets the same IP address. Certificates don't care about a relationship with IP address so if it does change all you have to do is update your A-record and the rest will catch up over a short period of time once your TTL expires for your DNS record.
 
 ## Assumptions
 
@@ -70,7 +70,7 @@ This is going to be brief and Apache is an animal all of its own. To keep this s
 
 This is what I do:
 
-1. Install Apache ("yum install httpd")
+1. Install Apache ("dnf install httpd")
 1. Create your website in /etc/httpd.
    1. I create two directories
    1. /etc/httpd/sites-available - where I put my web site config file.
@@ -129,7 +129,7 @@ Once you have APACHE installed and you can reach your server on port 80 on the I
 
 ## LetsEncrypt
 
-LetsEncrypt is a public CA widely used to provide free certificates to anyone who may need one. The entire process it automated so you must follow their process to get the certificate. If you want to read more about their process you can find it here: https://letsencrypt.org/getting-started/
+LetsEncrypt is a public CA widely used to provide free certificates to anyone who may need one. The entire process is automated so you must follow their process to get the certificate. If you want to read more about their process you can find it here: https://letsencrypt.org/getting-started/
 
 I'm working to define a very specific use case:
 
@@ -185,7 +185,7 @@ sudo snap install --classic certbot
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
-### Get and install your certificates **with a private key genenerated with type *RSA*.** As of this writing the PCE does not support ECC private key derived certificates.
+### Get and install your certificates **with a private key generated with type *RSA*.** As of this writing the PCE does not support ECC private key derived certificates.
 
 ```
 sudo certbot certonly --key-type rsa
@@ -208,7 +208,7 @@ The Certbot packages on your system come with a cron job or systemd timer that w
 sudo certbot renew --dry-run
 ```
 
-And finally we will need to automate the process using a cronjob so you don't have to think about renewing the certiricate every 90 days.
+And finally we will need to automate the process using a cronjob so you don't have to think about renewing the certificate every 90 days.
 
 ## Give me the BEEF!
 
@@ -218,9 +218,9 @@ If you did all of the above successfully you likely generated a certificate in t
 
 /etc/letsencrypt/live/[your-site-name-here]
 
-In that directory there will be 4 key files:
+In that directory there will be several key files:
 
-1. cert.pem - only the server certficate (I do not use this)
+1. cert.pem - only the server certificate (I do not use this)
 1. chain.pem - the server and first trust (I do not use this)
 1. fullchain.pem - the full certificate chain
 1. privkey.pem - the private key
@@ -228,7 +228,7 @@ In that directory there will be 4 key files:
 
 The two files of concern and what will be used on the PCE are the **fullchain.pem** and **privkey.pem**.
 
-Inside the **fullchain.pem** file we are interested in the **only the first two certificates** in that file. You can either take them out by hand or use a tool I created to extract the certificates individually and rebuild the certificate file on your own by hand.
+Inside the **fullchain.pem** file we are interested in **only the first two certificates** in that file. You can either take them out by hand or use a tool I created to extract the certificates individually and rebuild the certificate file on your own by hand.
 
 Once you have the certificates from Letsencrypt:
 
@@ -244,7 +244,7 @@ chmod 400 /var/lib/illumio-pce/cert/server.*
 chown ilo-pce: /var/lib/illumio-pce/cert/server.*
 ```
 
-Once you have created these files correctly created and in their proper places you can check your environment using:
+Once you have these files correctly created and in their proper places you can check your environment using:
 
 ```
 sudo -u ilo-pce illumio-pce-env check
@@ -259,7 +259,7 @@ If you do this by hand every 30-60 days you will always have a good certificate 
 The flow is basically this:
 
 1. Start Apache (systemctl start httpd)
-1. Check for a new certificate (sudo certbot --apache)
+1. Check for a new certificate
 1. Tear apart the fullchain.pem file to individual certs
 1. Combine cert1 and cert2 into server.crt and copy this combined certificate into /var/lib/illumio-pce/cert/
 1. Copy privkey.pem over server.key in /var/lib/illumio-pce/cert/
@@ -267,8 +267,10 @@ The flow is basically this:
 
 If you just want to check for new certs put this in your crontab:
 
-0 4 * * 1 : Check for new certificate ; /bin/certbot certonly renew
+```
+0 4 * * 1 : Check for new certificate ; /usr/bin/certbot renew
+```
 
-This will check for new certificates every Monday at 4am. You really don't need to do any more checking than once a week. The certficates will not renew until they are about 30 days from expiring. When they do renew make sure you extract the proper certificates and put them in place. Then you will need to restart the PCE to load these new certificates. If I ever automate this I'll put my code in here.
+This will check for new certificates every Monday at 4am. You really don't need to do any more checking than once a week. The certificates will not renew until they are about 30 days from expiring. When they do renew make sure you extract the proper certificates and put them in place. Then you will need to restart the PCE to load these new certificates. If I ever automate this I'll put my code in here.
 
 ## The end
